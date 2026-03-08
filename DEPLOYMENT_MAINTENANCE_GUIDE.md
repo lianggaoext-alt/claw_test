@@ -299,4 +299,10 @@ journalctl -u wecom-openclaw-bridge -n 200 --no-pager
 
 ---
 
+## 10. 对话命令索引
+
+日常通过助手维护用户，请参考：
+
+- `/root/.openclaw/workspace/COMMAND_INDEX.md`
+
 最后更新时间：自动生成于当前服务器环境
