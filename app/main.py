@@ -188,7 +188,8 @@ async def cron_deliver(request: Request, x_cron_token: str = Header(default=''))
     约定：webhook body 至少包含 `agentId`（或 `agent_id`）与 `summary`（可选）。
     """
     token = settings.cron_webhook_token.strip()
-    if token and x_cron_token.strip() != token:
+    query_token = str(request.query_params.get('token', '')).strip()
+    if token and x_cron_token.strip() != token and query_token != token:
         raise HTTPException(status_code=401, detail='invalid cron token')
 
     payload = await request.json()
