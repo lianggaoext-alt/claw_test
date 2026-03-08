@@ -1,11 +1,13 @@
+import threading
 import time
 from xml.etree import ElementTree as ET
- 
+
 from fastapi import FastAPI, HTTPException, Request, Response
 from fastapi.responses import PlainTextResponse
 
 from app.config import settings
 from app.openclaw_bridge import OpenClawBridgeError, ask_openclaw
+from app.wecom_api import WeComApiError, send_text_message
 from app.wecom_crypto import WeComCrypto, WeComCryptoError
 
 app = FastAPI(title='WeCom Callback Service', version='1.0.0')
@@ -49,12 +51,14 @@ async def receive_message(request: Request, msg_signature: str, timestamp: str, 
         content = msg_root.findtext('Content', '')
 
         if msg_type == 'text':
-            try:
-                reply_text = ask_openclaw(wecom_user_id=from_user, message=content)
-            except OpenClawBridgeError as exc:
-                reply_text = f'服务暂时不可用：{exc}'
+            threading.Thread(
+                target=_process_and_push_reply,
+                args=(from_user, content),
+                daemon=True,
+            ).start()
+            reply_text = '已收到，正在处理中…'
         else:
-            reply_text = f'已收到 {msg_type} 类型消息，当前仅自动回文本。'
+            reply_text = f'已收到 {msg_type} 类型消息。'
 
         reply_xml = build_reply_xml(from_user=from_user, to_user=to_user, content=reply_text)
         now = str(int(time.time()))
@@ -65,6 +69,19 @@ async def receive_message(request: Request, msg_signature: str, timestamp: str, 
         raise HTTPException(status_code=401, detail=str(exc)) from exc
     except ET.ParseError as exc:
         raise HTTPException(status_code=400, detail='invalid xml body') from exc
+
+
+def _process_and_push_reply(from_user: str, content: str) -> None:
+    try:
+        reply_text = ask_openclaw(wecom_user_id=from_user, message=content)
+    except OpenClawBridgeError as exc:
+        reply_text = f'OpenClaw暂时不可用：{exc}'
+
+    try:
+        send_text_message(to_user=from_user, content=reply_text)
+    except WeComApiError:
+        # Passive reply has already been returned; avoid raising in background thread.
+        pass
 
 
 def build_reply_xml(from_user: str, to_user: str, content: str) -> str:

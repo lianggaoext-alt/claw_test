@@ -5,7 +5,7 @@
 - URL 校验（`GET /wecom/callback`）
 - 接收企业微信加密消息（`POST /wecom/callback`）
 - 企业微信用户固定映射到 OpenClaw 会话（`wecom_<FromUserName>`）
-- 返回 OpenClaw 文本回复（加密后回传企业微信）
+- 被动回调快速应答（避免超时）+ 主动发送 OpenClaw 最终回复
 - 健康检查（`GET /healthz`）
 
 ## 1) 配置
