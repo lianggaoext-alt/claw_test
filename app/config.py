@@ -6,6 +6,7 @@ class Settings(BaseSettings):
     wecom_encoding_aes_key: str
     wecom_corp_id: str
     wecom_agent_id: int
+    wecom_secret: str
 
     # OpenClaw bridge settings
     openclaw_cli_path: str = 'openclaw'

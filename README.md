@@ -20,6 +20,7 @@ cp .env.example .env
 - `WECOM_ENCODING_AES_KEY`：企业微信回调 EncodingAESKey（43 位）
 - `WECOM_CORP_ID`：企业 ID（`ww...`）
 - `WECOM_AGENT_ID`：应用 AgentId
+- `WECOM_SECRET`：应用 Secret（用于后续主动调用企业微信 API）
 
 OpenClaw 桥接相关：
 
