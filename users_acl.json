@@ -9,6 +9,11 @@
       "enabled": true,
       "workspace": "/root/.openclaw/wecom-workspaces/DaiRuiYun",
       "agent_id": "wecom-dairuiyun"
+    },
+    "wanghedeweixinhao": {
+      "enabled": true,
+      "workspace": "/root/.openclaw/wecom-workspaces/wanghedeweixinhao",
+      "agent_id": "wecom-wanghedeweixinhao"
     }
   }
 }
