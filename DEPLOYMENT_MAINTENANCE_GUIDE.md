@@ -114,6 +114,62 @@ systemctl restart wecom-openclaw-bridge
 
 未在 ACL 的用户会收到：`你暂未开通权限，请联系管理员。`
 
+### ACL 用户维护命令清单
+
+#### 查看当前 ACL
+
+```bash
+cat /root/.openclaw/workspace/users_acl.json
+```
+
+#### 开通新用户（示例：Alice）
+
+```bash
+# 1) 创建独立 workspace
+mkdir -p /root/.openclaw/wecom-workspaces/Alice
+
+# 2) 创建独立 agent
+openclaw agents add wecom-alice \
+  --workspace /root/.openclaw/wecom-workspaces/Alice \
+  --non-interactive --json
+
+# 3) 编辑 ACL，添加用户条目（enabled/workspace/agent_id）
+vi /root/.openclaw/workspace/users_acl.json
+
+# 4) 重启服务
+systemctl restart wecom-openclaw-bridge
+```
+
+#### 禁用用户（保留数据）
+
+```bash
+# 将该用户 enabled 改为 false
+vi /root/.openclaw/workspace/users_acl.json
+systemctl restart wecom-openclaw-bridge
+```
+
+#### 删除用户（谨慎）
+
+```bash
+# 1) 从 ACL 删除条目
+vi /root/.openclaw/workspace/users_acl.json
+
+# 2) 删除独立 agent
+openclaw agents delete wecom-alice
+
+# 3) 可选：删除该用户工作空间数据
+rm -rf /root/.openclaw/wecom-workspaces/Alice
+
+# 4) 重启服务
+systemctl restart wecom-openclaw-bridge
+```
+
+#### 检查 ACL 开关状态
+
+```bash
+grep OPENCLAW_ACL_ENABLED /root/.openclaw/workspace/.env
+```
+
 ## 6. 日常操作命令
 
 以下命令在服务器执行。
