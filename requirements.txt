@@ -1,0 +1,4 @@
+fastapi==0.115.12
+uvicorn[standard]==0.34.0
+pycryptodome==3.23.0
+pydantic-settings==2.10.1
