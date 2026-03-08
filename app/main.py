@@ -5,6 +5,7 @@ from fastapi import FastAPI, HTTPException, Request, Response
 from fastapi.responses import PlainTextResponse
 
 from app.config import settings
+from app.openclaw_bridge import OpenClawBridgeError, ask_openclaw
 from app.wecom_crypto import WeComCrypto, WeComCryptoError
 
 app = FastAPI(title='WeCom Callback Service', version='1.0.0')
@@ -48,7 +49,10 @@ async def receive_message(request: Request, msg_signature: str, timestamp: str, 
         content = msg_root.findtext('Content', '')
 
         if msg_type == 'text':
-            reply_text = f'已收到你的消息：{content}'
+            try:
+                reply_text = ask_openclaw(wecom_user_id=from_user, message=content)
+            except OpenClawBridgeError as exc:
+                reply_text = f'服务暂时不可用：{exc}'
         else:
             reply_text = f'已收到 {msg_type} 类型消息，当前仅自动回文本。'
 

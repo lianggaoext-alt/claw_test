@@ -1,3 +1,16 @@
 .openclaw/
 *.log
 .DS_Store
+.env
+.venv/
+__pycache__/
+app/__pycache__/
+CREDENTIALS_PRIVATE.md
+
+# Local OpenClaw assistant context files
+AGENTS.md
+HEARTBEAT.md
+IDENTITY.md
+SOUL.md
+TOOLS.md
+USER.md
