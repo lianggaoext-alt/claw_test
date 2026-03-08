@@ -19,11 +19,13 @@ def session_id_for_wecom_user(wecom_user_id: str) -> str:
     return f"{settings.openclaw_session_prefix}{_sanitize_session_part(wecom_user_id)}"
 
 
-def ask_openclaw(wecom_user_id: str, message: str, workspace_dir: str) -> str:
+def ask_openclaw(wecom_user_id: str, message: str, workspace_dir: str, agent_id: str) -> str:
     session_id = session_id_for_wecom_user(wecom_user_id)
     cmd = [
         settings.openclaw_cli_path,
         'agent',
+        '--agent',
+        agent_id,
         '--session-id',
         session_id,
         '--message',

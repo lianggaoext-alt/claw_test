@@ -58,7 +58,7 @@ async def receive_message(request: Request, msg_signature: str, timestamp: str, 
             else:
                 threading.Thread(
                     target=_process_and_push_reply,
-                    args=(from_user, content, decision.workspace_dir),
+                    args=(from_user, content, decision.workspace_dir, decision.agent_id),
                     daemon=True,
                 ).start()
                 reply_text = '已收到，正在处理中…'
@@ -76,9 +76,14 @@ async def receive_message(request: Request, msg_signature: str, timestamp: str, 
         raise HTTPException(status_code=400, detail='invalid xml body') from exc
 
 
-def _process_and_push_reply(from_user: str, content: str, workspace_dir: str) -> None:
+def _process_and_push_reply(from_user: str, content: str, workspace_dir: str, agent_id: str) -> None:
     try:
-        reply_text = ask_openclaw(wecom_user_id=from_user, message=content, workspace_dir=workspace_dir)
+        reply_text = ask_openclaw(
+            wecom_user_id=from_user,
+            message=content,
+            workspace_dir=workspace_dir,
+            agent_id=agent_id,
+        )
     except OpenClawBridgeError:
         reply_text = '我这边处理超时了，请稍后再试一次。'
 

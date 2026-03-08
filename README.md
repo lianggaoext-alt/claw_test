@@ -57,7 +57,7 @@ uvicorn app.main:app --host 0.0.0.0 --port 8000
 - 企业微信 `FromUserName` → OpenClaw `session-id`
 - 规则：`{OPENCLAW_SESSION_PREFIX}{FromUserName}`（特殊字符会自动替换成 `_`）
 - 每个用户独立 workspace：`{OPENCLAW_WORKSPACE_ROOT}/{FromUserName}`
-- 启用白名单后，仅 `users_acl.json` 中的用户可用
+- 启用白名单后，仅 `users_acl.json` 中配置了 `agent_id` 的用户可用
 - 未授权用户会收到：`OPENCLAW_NO_ACCESS_REPLY`
 
 示例：

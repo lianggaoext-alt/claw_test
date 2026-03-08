@@ -1,8 +1,9 @@
 {
   "users": {
-    "zhangsan": {
+    "GaoLiang": {
       "enabled": true,
-      "workspace": "/root/.openclaw/wecom-workspaces/zhangsan"
+      "workspace": "/root/.openclaw/wecom-workspaces/GaoLiang",
+      "agent_id": "wecom-gaoliang"
     }
   }
 }

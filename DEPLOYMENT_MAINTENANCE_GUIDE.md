@@ -85,9 +85,10 @@ ACL 文件：`/root/.openclaw/workspace/users_acl.json`
 ```json
 {
   "users": {
-    "zhangsan": {
+    "GaoLiang": {
       "enabled": true,
-      "workspace": "/root/.openclaw/wecom-workspaces/zhangsan"
+      "workspace": "/root/.openclaw/wecom-workspaces/GaoLiang",
+      "agent_id": "wecom-gaoliang"
     }
   }
 }
@@ -95,9 +96,17 @@ ACL 文件：`/root/.openclaw/workspace/users_acl.json`
 
 操作步骤：
 
-1. 编辑 ACL 文件，添加/禁用用户
-2. 确认 `.env` 中 `OPENCLAW_ACL_ENABLED=true`
-3. 重启服务生效
+1. 为用户创建隔离 agent（一次性）
+
+```bash
+openclaw agents add wecom-gaoliang \
+  --workspace /root/.openclaw/wecom-workspaces/GaoLiang \
+  --non-interactive --json
+```
+
+2. 编辑 ACL 文件，添加/禁用用户（必须填写 `agent_id`）
+3. 确认 `.env` 中 `OPENCLAW_ACL_ENABLED=true`
+4. 重启服务生效
 
 ```bash
 systemctl restart wecom-openclaw-bridge

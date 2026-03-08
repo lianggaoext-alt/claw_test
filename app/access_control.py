@@ -10,6 +10,7 @@ from app.config import settings
 class AccessDecision:
     allowed: bool
     workspace_dir: str
+    agent_id: str
     reason: str = ''
 
 
@@ -33,18 +34,22 @@ def resolve_access(wecom_user_id: str) -> AccessDecision:
     if not settings.openclaw_acl_enabled:
         ws = _default_workspace(wecom_user_id)
         os.makedirs(ws, exist_ok=True)
-        return AccessDecision(allowed=True, workspace_dir=ws)
+        return AccessDecision(allowed=True, workspace_dir=ws, agent_id='main')
 
     acl = _load_acl()
     users = acl.get('users', {}) if isinstance(acl, dict) else {}
     item = users.get(wecom_user_id)
     if not item:
-        return AccessDecision(allowed=False, workspace_dir='', reason='not_allowlisted')
+        return AccessDecision(allowed=False, workspace_dir='', agent_id='', reason='not_allowlisted')
 
     enabled = bool(item.get('enabled', True))
     if not enabled:
-        return AccessDecision(allowed=False, workspace_dir='', reason='disabled')
+        return AccessDecision(allowed=False, workspace_dir='', agent_id='', reason='disabled')
 
     workspace_dir = item.get('workspace') or _default_workspace(wecom_user_id)
+    agent_id = item.get('agent_id', '')
+    if not agent_id:
+        return AccessDecision(allowed=False, workspace_dir='', agent_id='', reason='missing_agent_id')
+
     os.makedirs(workspace_dir, exist_ok=True)
-    return AccessDecision(allowed=True, workspace_dir=workspace_dir)
+    return AccessDecision(allowed=True, workspace_dir=workspace_dir, agent_id=agent_id)
