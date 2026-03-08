@@ -5,6 +5,7 @@ from xml.etree import ElementTree as ET
 from fastapi import FastAPI, HTTPException, Request, Response
 from fastapi.responses import PlainTextResponse
 
+from app.access_control import resolve_access
 from app.config import settings
 from app.openclaw_bridge import OpenClawBridgeError, ask_openclaw
 from app.wecom_api import WeComApiError, send_text_message
@@ -51,12 +52,16 @@ async def receive_message(request: Request, msg_signature: str, timestamp: str, 
         content = msg_root.findtext('Content', '')
 
         if msg_type == 'text':
-            threading.Thread(
-                target=_process_and_push_reply,
-                args=(from_user, content),
-                daemon=True,
-            ).start()
-            reply_text = '已收到，正在处理中…'
+            decision = resolve_access(from_user)
+            if not decision.allowed:
+                reply_text = settings.openclaw_no_access_reply
+            else:
+                threading.Thread(
+                    target=_process_and_push_reply,
+                    args=(from_user, content, decision.workspace_dir),
+                    daemon=True,
+                ).start()
+                reply_text = '已收到，正在处理中…'
         else:
             reply_text = f'已收到 {msg_type} 类型消息。'
 
@@ -71,9 +76,9 @@ async def receive_message(request: Request, msg_signature: str, timestamp: str, 
         raise HTTPException(status_code=400, detail='invalid xml body') from exc
 
 
-def _process_and_push_reply(from_user: str, content: str) -> None:
+def _process_and_push_reply(from_user: str, content: str, workspace_dir: str) -> None:
     try:
-        reply_text = ask_openclaw(wecom_user_id=from_user, message=content)
+        reply_text = ask_openclaw(wecom_user_id=from_user, message=content, workspace_dir=workspace_dir)
     except OpenClawBridgeError:
         reply_text = '我这边处理超时了，请稍后再试一次。'
 

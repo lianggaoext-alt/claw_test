@@ -52,10 +52,15 @@ OpenClaw 相关：
 - `OPENCLAW_CLI_PATH`：默认 `openclaw`
 - `OPENCLAW_TIMEOUT_SECONDS`：当前 `60`
 - `OPENCLAW_SESSION_PREFIX`：当前 `wecom_`
+- `OPENCLAW_WORKSPACE_ROOT`：每用户独立工作空间根目录
+- `OPENCLAW_ACL_ENABLED`：是否启用用户白名单
+- `OPENCLAW_ACL_FILE`：白名单文件路径（当前 `/root/.openclaw/workspace/users_acl.json`）
+- `OPENCLAW_NO_ACCESS_REPLY`：未开通权限时的回复文案
 
 会话映射规则：
 
 - 每个企微用户固定一个 OpenClaw 会话：`wecom_<FromUserName>`
+- 每个企微用户固定一个独立工作空间：`<OPENCLAW_WORKSPACE_ROOT>/<FromUserName>`
 
 ---
 
@@ -71,7 +76,36 @@ OpenClaw 相关：
 
 ---
 
-## 5. 日常操作命令
+## 5. 用户授权（ACL）管理
+
+ACL 文件：`/root/.openclaw/workspace/users_acl.json`
+
+示例结构：
+
+```json
+{
+  "users": {
+    "zhangsan": {
+      "enabled": true,
+      "workspace": "/root/.openclaw/wecom-workspaces/zhangsan"
+    }
+  }
+}
+```
+
+操作步骤：
+
+1. 编辑 ACL 文件，添加/禁用用户
+2. 确认 `.env` 中 `OPENCLAW_ACL_ENABLED=true`
+3. 重启服务生效
+
+```bash
+systemctl restart wecom-openclaw-bridge
+```
+
+未在 ACL 的用户会收到：`你暂未开通权限，请联系管理员。`
+
+## 6. 日常操作命令
 
 以下命令在服务器执行。
 

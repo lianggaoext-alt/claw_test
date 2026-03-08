@@ -1,0 +1,8 @@
+{
+  "users": {
+    "zhangsan": {
+      "enabled": true,
+      "workspace": "/root/.openclaw/wecom-workspaces/zhangsan"
+    }
+  }
+}

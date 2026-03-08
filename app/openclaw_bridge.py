@@ -19,7 +19,7 @@ def session_id_for_wecom_user(wecom_user_id: str) -> str:
     return f"{settings.openclaw_session_prefix}{_sanitize_session_part(wecom_user_id)}"
 
 
-def ask_openclaw(wecom_user_id: str, message: str) -> str:
+def ask_openclaw(wecom_user_id: str, message: str, workspace_dir: str) -> str:
     session_id = session_id_for_wecom_user(wecom_user_id)
     cmd = [
         settings.openclaw_cli_path,
@@ -41,6 +41,7 @@ def ask_openclaw(wecom_user_id: str, message: str) -> str:
             text=True,
             timeout=settings.openclaw_timeout_seconds + 1,
             check=False,
+            cwd=workspace_dir,
         )
     except subprocess.TimeoutExpired as exc:
         raise OpenClawBridgeError('openclaw timeout (>5s), fallback reply used') from exc

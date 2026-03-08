@@ -27,6 +27,10 @@ OpenClaw 桥接相关：
 - `OPENCLAW_CLI_PATH`：默认 `openclaw`
 - `OPENCLAW_TIMEOUT_SECONDS`：默认 `60`
 - `OPENCLAW_SESSION_PREFIX`：默认 `wecom_`
+- `OPENCLAW_WORKSPACE_ROOT`：每个企微用户独立工作空间根目录
+- `OPENCLAW_ACL_ENABLED`：是否启用白名单（true/false）
+- `OPENCLAW_ACL_FILE`：白名单文件路径（JSON）
+- `OPENCLAW_NO_ACCESS_REPLY`：未开通用户的回复文案
 
 ## 2) 本地运行
 
@@ -48,10 +52,13 @@ uvicorn app.main:app --host 0.0.0.0 --port 8000
 
 > 企业微信保存时会发起 URL 校验。服务会验签并解密 `echostr` 后返回明文。
 
-## 4) 会话映射策略
+## 4) 会话映射与权限控制
 
 - 企业微信 `FromUserName` → OpenClaw `session-id`
 - 规则：`{OPENCLAW_SESSION_PREFIX}{FromUserName}`（特殊字符会自动替换成 `_`）
+- 每个用户独立 workspace：`{OPENCLAW_WORKSPACE_ROOT}/{FromUserName}`
+- 启用白名单后，仅 `users_acl.json` 中的用户可用
+- 未授权用户会收到：`OPENCLAW_NO_ACCESS_REPLY`
 
 示例：
 - `zhangsan` → `wecom_zhangsan`
