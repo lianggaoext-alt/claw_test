@@ -6,6 +6,8 @@
 - 接收企业微信加密消息（`POST /wecom/callback`）
 - 企业微信用户固定映射到 OpenClaw 会话（`wecom_<FromUserName>`）
 - 被动回调快速应答（避免超时）+ 主动发送 OpenClaw 最终回复
+- 内置消息去重、推送失败重试（指数退避）与结构化日志
+- 首次开通用户欢迎语（产品体验优化）
 - 健康检查（`GET /healthz`）
 
 ## 1) 配置

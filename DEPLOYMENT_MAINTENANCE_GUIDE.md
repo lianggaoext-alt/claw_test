@@ -66,13 +66,17 @@ OpenClaw 相关：
 
 ## 4. 服务架构说明
 
-当前实现为“双通道回复”：
+当前实现为“双通道回复 + 稳定性增强”：
 
 1. **被动回调快速回复**（避免企微回调超时）
 2. **后台异步调用 OpenClaw**
 3. **通过企微 API 主动发送最终回复**（依赖 `WECOM_SECRET`）
+4. **消息去重**（同一消息重复投递只处理一次）
+5. **主动推送失败重试**（指数退避）
+6. **结构化日志**（便于定位用户、耗时、失败原因）
+7. **首次开通欢迎语**（产品体验优化）
 
-这样可显著降低“偶发不回消息”的问题。
+这样可显著降低“偶发不回消息”和“重复回复”的问题。
 
 ---
 
@@ -188,6 +192,18 @@ systemctl start wecom-openclaw-bridge
 ```bash
 journalctl -u wecom-openclaw-bridge -f
 journalctl -u wecom-openclaw-bridge -n 200 --no-pager
+```
+
+结构化日志关键事件：
+- `incoming`：收到消息
+- `duplicate_dropped`：重复消息被去重
+- `push_send_ok` / `push_send_fail`：主动推送结果
+- `process_done`：处理完成（含耗时）
+
+示例筛选：
+
+```bash
+journalctl -u wecom-openclaw-bridge -n 300 --no-pager | grep '"event":"push_send_fail"'
 ```
 
 ### 5.3 Nginx 配置测试与重载

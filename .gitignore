@@ -6,6 +6,7 @@
 __pycache__/
 app/__pycache__/
 CREDENTIALS_PRIVATE.md
+user_state.json
 
 # Local OpenClaw assistant context files
 AGENTS.md
