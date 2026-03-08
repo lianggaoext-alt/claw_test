@@ -76,6 +76,7 @@ def build_reply_xml(from_user: str, to_user: str, content: str) -> str:
         f'<CreateTime>{create_time}</CreateTime>'
         '<MsgType><![CDATA[text]]></MsgType>'
         f'<Content><![CDATA[{content}]]></Content>'
+        f'<AgentID>{settings.wecom_agent_id}</AgentID>'
         '</xml>'
     )
 
