@@ -27,6 +27,11 @@
 
 ## 2. 当前回调地址
 
+- 企业微信回调：`http://dsai.dansewudao.com:7090/reply?agid=1000211`
+- Cron 回推 webhook：`http://dsai.dansewudao.com:7090/cron/deliver`
+  - Header: `X-Cron-Token: <CRON_WEBHOOK_TOKEN>`
+
+
 企业微信后台“接收消息服务器配置”使用：
 
 `http://dsai.dansewudao.com:7090/reply?agid=1000211`

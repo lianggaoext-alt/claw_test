@@ -36,6 +36,9 @@ class Settings(BaseSettings):
     # 未开通用户的默认回复文案
     openclaw_no_access_reply: str = '你暂未开通权限，请联系管理员。'
 
+    # Cron webhook 回调鉴权 token（用于把定时任务结果转发给企微用户）
+    cron_webhook_token: str = ''
+
     # 指定 `.env` 作为配置来源；忽略未声明的额外字段
     model_config = SettingsConfigDict(env_file='.env', env_file_encoding='utf-8', extra='ignore')
 
