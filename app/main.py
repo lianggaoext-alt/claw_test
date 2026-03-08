@@ -74,8 +74,8 @@ async def receive_message(request: Request, msg_signature: str, timestamp: str, 
 def _process_and_push_reply(from_user: str, content: str) -> None:
     try:
         reply_text = ask_openclaw(wecom_user_id=from_user, message=content)
-    except OpenClawBridgeError as exc:
-        reply_text = f'OpenClaw暂时不可用：{exc}'
+    except OpenClawBridgeError:
+        reply_text = '我这边处理超时了，请稍后再试一次。'
 
     try:
         send_text_message(to_user=from_user, content=reply_text)
