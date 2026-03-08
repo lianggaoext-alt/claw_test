@@ -1,6 +1,7 @@
 import json
 import re
 import subprocess
+import time
 
 from app.config import settings
 
@@ -32,13 +33,19 @@ def ask_openclaw(wecom_user_id: str, message: str) -> str:
         str(settings.openclaw_timeout_seconds),
     ]
 
-    proc = subprocess.run(
-        cmd,
-        capture_output=True,
-        text=True,
-        timeout=settings.openclaw_timeout_seconds + 5,
-        check=False,
-    )
+    started = time.time()
+    try:
+        proc = subprocess.run(
+            cmd,
+            capture_output=True,
+            text=True,
+            timeout=settings.openclaw_timeout_seconds + 1,
+            check=False,
+        )
+    except subprocess.TimeoutExpired as exc:
+        raise OpenClawBridgeError('openclaw timeout (>5s), fallback reply used') from exc
+
+    _elapsed = time.time() - started
 
     if proc.returncode != 0:
         raise OpenClawBridgeError(f'openclaw failed: {proc.stderr.strip() or proc.stdout.strip()}')
