@@ -14,6 +14,11 @@
       "enabled": true,
       "workspace": "/root/.openclaw/wecom-workspaces/wanghedeweixinhao",
       "agent_id": "wecom-wanghedeweixinhao"
+    },
+    "pj": {
+      "enabled": true,
+      "workspace": "/root/.openclaw/wecom-workspaces/pj",
+      "agent_id": "wecom-pj"
     }
   }
 }
