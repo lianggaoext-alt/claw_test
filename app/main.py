@@ -143,20 +143,6 @@ def _send_with_retry(to_user: str, content: str, max_attempts: int = 3) -> bool:
     return False
 
 
-def _wecom_user_from_agent_id(agent_id: str) -> str:
-    """根据 agent_id 反查企微用户ID（来自 ACL 文件）。"""
-    try:
-        acl = json.loads(Path(settings.openclaw_acl_file).read_text(encoding='utf-8'))
-    except Exception:
-        return ''
-
-    users = acl.get('users', {}) if isinstance(acl, dict) else {}
-    for uid, item in users.items():
-        if isinstance(item, dict) and item.get('agent_id') == agent_id:
-            return uid
-    return ''
-
-
 def _resolve_wecom_user_by_agent_id(agent_id: str) -> str:
     """根据 agent_id 反查企微用户ID。"""
     try:
@@ -223,53 +209,6 @@ async def cron_deliver(request: Request, x_cron_token: str = Header(default=''))
     if not ok:
         raise HTTPException(status_code=502, detail='push failed')
     return {'ok': True, 'agent_id': agent_id, 'to_user': user_id}
-
-
-@app.post('/cron/deliver')
-async def cron_deliver(request: Request, x_cron_token: str = Header(default='', alias='X-Cron-Token')) -> dict:
-    """接收 cron webhook 回调，并把结果推送给创建任务的企微 agent 用户。
-
-    期望 payload 至少包含：
-    - agentId（推荐）
-    - summary / text（任务摘要）
-    """
-    if settings.cron_webhook_token and x_cron_token != settings.cron_webhook_token:
-        raise HTTPException(status_code=401, detail='invalid cron token')
-
-    try:
-        data = await request.json()
-    except Exception as exc:
-        raise HTTPException(status_code=400, detail='invalid json') from exc
-
-    agent_id = (
-        data.get('agentId')
-        or data.get('agent', {}).get('id') if isinstance(data.get('agent'), dict) else ''
-    ) or ''
-    if not agent_id:
-        # 兼容 run event 结构
-        agent_id = data.get('job', {}).get('agentId', '') if isinstance(data.get('job'), dict) else ''
-
-    summary = data.get('summary') or data.get('text') or ''
-    if not summary and isinstance(data.get('result'), dict):
-        summary = data['result'].get('summary', '')
-
-    if not summary:
-        summary = '定时任务已完成。'
-
-    if not agent_id:
-        raise HTTPException(status_code=400, detail='missing agentId')
-
-    # 仅处理 wecom-* 任务；其他通道任务可继续走原生 announce
-    if not str(agent_id).startswith('wecom-'):
-        return {'ok': True, 'skipped': True, 'reason': 'non-wecom-agent'}
-
-    wecom_user = _wecom_user_from_agent_id(str(agent_id))
-    if not wecom_user:
-        raise HTTPException(status_code=400, detail='agent not mapped to wecom user')
-
-    ok = _send_with_retry(to_user=wecom_user, content=str(summary), max_attempts=3)
-    _log('cron_webhook_delivered', agent_id=agent_id, to_user=wecom_user, pushed=ok)
-    return {'ok': ok, 'agentId': agent_id, 'toUser': wecom_user}
 
 
 @app.get('/wecom/callback', response_class=PlainTextResponse)

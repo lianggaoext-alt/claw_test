@@ -22,6 +22,7 @@
 - 已配置域名：`dsai.dansewudao.com`
 - 已监听端口：`80`、`7090`
 - 回调入口：`/reply`（转发到后端 `/wecom/callback`）
+- Cron 回推入口：`/cron/deliver`（用于 wecom agent 定时任务结果回推）
 
 ---
 
@@ -61,6 +62,7 @@ OpenClaw 相关：
 - `OPENCLAW_ACL_ENABLED`：是否启用用户白名单
 - `OPENCLAW_ACL_FILE`：白名单文件路径（当前 `/root/.openclaw/workspace/users_acl.json`）
 - `OPENCLAW_NO_ACCESS_REPLY`：未开通权限时的回复文案
+- `CRON_WEBHOOK_TOKEN`：cron webhook 回调鉴权 token
 
 会话映射规则：
 
